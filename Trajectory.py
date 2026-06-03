@@ -6,7 +6,7 @@ from scipy.signal import find_peaks
 D = 1.5
 sigma = 1
 mu =0
-deltat=1
+deltat=0
 Dplus=3
 Dmoins=0
 pd=1/(Dplus-Dmoins)
@@ -15,10 +15,12 @@ def path(sigma,mu,deltat,D):
     x.append(0)
     deltax = []
     t= []
+    tinst =0
     t.append(0)
     for i in range(1,100):
         eta= random.gauss(mu, sigma)
-        t.append(i)
+        tinst = tinst + deltat
+        t.append(tinst)
         x.append(x[len(x)-1]+np.sqrt(2*D*deltat)*eta)
         deltax.append(np.sqrt(2*D*deltat)*eta)
     return t,x,np.array(deltax)
