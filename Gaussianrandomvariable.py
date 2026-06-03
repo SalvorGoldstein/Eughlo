@@ -7,7 +7,7 @@ def gaussian(sigma,mu,x):
 sigma = 1
 mu =0
 
-xi = np.linspace(-100,100,10000)
+xi = np.linspace(-100,100,10000000)
 yi = gaussian(sigma,mu,xi)
 
 for i in range(10000): 
