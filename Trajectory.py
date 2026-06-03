@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import random
 import scipy.integrate as inte
 from scipy.signal import find_peaks
-D = 1e-10
+D = 1.5
 sigma = 1
 mu =0
 deltat=1
-Dplus=3.28e-1
+Dplus=3
 Dmoins=0
 pd=1/(Dplus-Dmoins)
 def path(sigma,mu,deltat,D):
@@ -16,24 +16,17 @@ def path(sigma,mu,deltat,D):
     deltax = []
     t= []
     t.append(0)
-    for i in range(1,10):
+    for i in range(1,100):
         eta= random.gauss(mu, sigma)
         t.append(i)
         x.append(x[len(x)-1]+np.sqrt(2*D*deltat)*eta)
         deltax.append(np.sqrt(2*D*deltat)*eta)
     return t,x,np.array(deltax)
-
-
+chemin = path(sigma, mu, deltat, D)
+deltax = chemin[2]
 def pics(x, L, height=None, prominence=2e-48, distance=None):
     peaks, props = find_peaks(L, height=height, prominence=prominence, distance=distance)
     return peaks
-
-
-def moygliss(data,taille=5):
-    N = np.array(data)
-    noyau = np.ones(taille) / taille
-    return np.convolve(N, noyau, mode='same')
-
 
 def aff(D_val):
     xf= []
@@ -54,9 +47,7 @@ def aff(D_val):
     return 
 
 
-def Lfunc(D_val):
-    chemin = path(sigma, mu, deltat, D_val)
-    deltax = chemin[2]
+def Lfunc(D_val,deltax):
     log_L = np.sum(-0.5 * np.log(4 * np.pi * D_val * deltat)- deltax**2 / (4 * D_val * deltat))
     L=np.exp(log_L)
     return L
@@ -66,13 +57,17 @@ def PD(D_val):
         return 1/ (Dplus - Dmoins)
     else:
         return 0
-    
-def mult(D_val):
-    return Lfunc(D_val)*PD(D_val)
+
+
+
+
+
+def mult(D_val,deltax):
+    return Lfunc(D_val,deltax)*PD(D_val)
 
 
 def Pdata(Dplus,Dmoins):
-    return inte.quad(mult, Dmoins, Dplus)
+    return 
 
 
 
@@ -81,27 +76,24 @@ def Pdata(Dplus,Dmoins):
 #aff(D)
 
 
-
+###########
 plt.figure()
-D_grid = np.linspace(Dmoins, Dplus, 30000)
-for j in range(100):
-    y= []
-    for i in range(len(D_grid)):
-        y.append(Lfunc(D_grid[i])*PD(D_grid[i]))
-    print(j)
-    plt.plot(D_grid, y)
-    y= []
-    
-    
+D_grid = np.linspace(Dmoins, Dplus, 3000)
+y=[]
+for i in range(len(D_grid)):
+   y.append( mult(D_grid[i],deltax))
+y= np.array(y)[1:]
+########
+dD=(Dplus-Dmoins)/1000
+D_grid=D_grid[1:]
+PData = np.sum(y*dD) 
+print(PData)
+print(y)
+y = y/PData
 
 
 
-
-
-
-xmax =D_grid[pics(D_grid,y)]
-
-
+plt.plot(D_grid,y)
 plt.xlim(Dmoins,Dplus)
 plt.xlabel("D (m²/s)")
 plt.ylabel("P(D | data)")
